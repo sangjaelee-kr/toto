@@ -25,6 +25,14 @@
   }
   .wrap { max-width: 680px; margin: 0 auto; }
 
+  .sync {
+    display: flex; align-items: center; justify-content: center; gap: 7px;
+    font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 12px;
+  }
+  .sync .dot { width: 8px; height: 8px; border-radius: 50%; background: #8a8f9e; flex: none; }
+  .sync.on .dot { background: var(--green); box-shadow: 0 0 8px rgba(46,158,91,0.8); }
+  .sync.off .dot { background: var(--red); }
+
   .match {
     text-align: center; border: 1px solid var(--line); border-radius: 20px;
     padding: 26px 18px 22px;
@@ -41,8 +49,16 @@
   .eyebrow { font-size: 12px; letter-spacing: 0.18em; color: var(--muted); font-weight: 700; }
   .teams { display: flex; align-items: center; justify-content: center; gap: 22px; margin: 14px 0 10px; }
   .team { width: 130px; }
-  .team .flag { font-size: 46px; line-height: 1; display: block; }
-  .team .name { font-size: 18px; font-weight: 900; margin-top: 8px; }
+  .team .flag-img {
+    width: 84px; height: 56px; border-radius: 8px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.15);
+    display: block; margin: 0 auto;
+  }
+  .team .name { font-size: 18px; font-weight: 900; margin-top: 10px; }
+  .flag-mini {
+    width: 27px; height: 18px; border-radius: 3px; vertical-align: -3px;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.2);
+  }
   .vs { font-size: 14px; font-weight: 800; color: var(--gold); letter-spacing: 0.2em; }
   .kickoff { font-size: 13px; color: var(--muted); line-height: 1.6; }
   .kickoff b { color: var(--ink); }
@@ -128,14 +144,61 @@
 </style>
 </head>
 <body>
+
+<!-- 국기 SVG 정의 (윈도우에서도 깨지지 않는 진짜 국기) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <!-- 대한민국 태극기 -->
+    <symbol id="flag-kr" viewBox="0 0 90 60">
+      <rect width="90" height="60" fill="#FFFFFF"/>
+      <g transform="rotate(-33.69 45 30)">
+        <circle cx="45" cy="30" r="15" fill="#0047A0"/>
+        <path d="M 30,30 A 15,15 0 0 1 60,30 A 7.5,7.5 0 0 1 45,30 A 7.5,7.5 0 0 0 30,30 Z" fill="#CD2E3A"/>
+      </g>
+      <!-- 건 ☰ (좌상) -->
+      <g transform="translate(22.5 15) rotate(-56.31)" fill="#0F0F0F">
+        <rect x="-8" y="-6.2" width="16" height="2.6"/>
+        <rect x="-8" y="-1.3" width="16" height="2.6"/>
+        <rect x="-8" y="3.6"  width="16" height="2.6"/>
+      </g>
+      <!-- 감 ☵ (우상) -->
+      <g transform="translate(67.5 15) rotate(56.31)" fill="#0F0F0F">
+        <rect x="-8" y="-6.2" width="7" height="2.6"/><rect x="1" y="-6.2" width="7" height="2.6"/>
+        <rect x="-8" y="-1.3" width="16" height="2.6"/>
+        <rect x="-8" y="3.6"  width="7" height="2.6"/><rect x="1" y="3.6" width="7" height="2.6"/>
+      </g>
+      <!-- 리 ☲ (좌하) -->
+      <g transform="translate(22.5 45) rotate(56.31)" fill="#0F0F0F">
+        <rect x="-8" y="-6.2" width="16" height="2.6"/>
+        <rect x="-8" y="-1.3" width="7" height="2.6"/><rect x="1" y="-1.3" width="7" height="2.6"/>
+        <rect x="-8" y="3.6"  width="16" height="2.6"/>
+      </g>
+      <!-- 곤 ☷ (우하) -->
+      <g transform="translate(67.5 45) rotate(-56.31)" fill="#0F0F0F">
+        <rect x="-8" y="-6.2" width="7" height="2.6"/><rect x="1" y="-6.2" width="7" height="2.6"/>
+        <rect x="-8" y="-1.3" width="7" height="2.6"/><rect x="1" y="-1.3" width="7" height="2.6"/>
+        <rect x="-8" y="3.6"  width="7" height="2.6"/><rect x="1" y="3.6" width="7" height="2.6"/>
+      </g>
+    </symbol>
+    <!-- 체코 국기 -->
+    <symbol id="flag-cz" viewBox="0 0 90 60">
+      <rect width="90" height="30" fill="#FFFFFF"/>
+      <rect y="30" width="90" height="30" fill="#D7141A"/>
+      <path d="M 0,0 L 45,30 L 0,60 Z" fill="#11457E"/>
+    </symbol>
+  </defs>
+</svg>
+
 <div class="wrap">
+
+  <div class="sync" id="sync"><span class="dot"></span><span id="sync-text">연결 확인 중...</span></div>
 
   <div class="match">
     <div class="eyebrow">2026 FIFA 월드컵 · A조 조별리그 1차전</div>
     <div class="teams">
-      <div class="team"><span class="flag">🇰🇷</span><div class="name">대한민국</div></div>
+      <div class="team"><svg class="flag-img"><use href="#flag-kr"/></svg><div class="name">대한민국</div></div>
       <div class="vs">VS</div>
-      <div class="team"><span class="flag">🇨🇿</span><div class="name">체코</div></div>
+      <div class="team"><svg class="flag-img"><use href="#flag-cz"/></svg><div class="name">체코</div></div>
     </div>
     <div class="kickoff"><b>6월 12일 (금) 오전 11:00</b> 한국시각<br>멕시코 과달라하라 스타디움 · JTBC / KBS2 중계</div>
   </div>
@@ -144,15 +207,14 @@
     <h2>⚽ 예측 등록</h2>
     <div class="grid form-top">
       <div><label>이름</label><input id="f-name" placeholder="예: 상재" maxlength="12"></div>
-      <div><label>건 것 (선택)</label><input id="f-stake" placeholder="예: 치킨, 커피, 점심" maxlength="20"></div>
     </div>
     <div class="grid mt">
       <div>
         <label>스코어 예측</label>
         <div class="score-input">
-          <div style="flex:1"><input id="f-kr" type="number" min="0" max="15" value="1"></div>
+          <div style="flex:1"><label style="text-align:center"><svg class="flag-mini"><use href="#flag-kr"/></svg> 한국</label><input id="f-kr" type="number" min="0" max="15" value="1"></div>
           <div class="colon">:</div>
-          <div style="flex:1"><input id="f-cz" type="number" min="0" max="15" value="0"></div>
+          <div style="flex:1"><label style="text-align:center"><svg class="flag-mini"><use href="#flag-cz"/></svg> 체코</label><input id="f-cz" type="number" min="0" max="15" value="0"></div>
         </div>
       </div>
       <div>
@@ -173,21 +235,21 @@
       </div>
     </div>
     <button class="cta" onclick="addBet()">예측 등록하기</button>
+    <button class="cta share" onclick="shareLink()">📋 공유 링크 복사</button>
+    <div class="hint">친구들에게 <b>공유 링크</b>를 보내야 같은 내기판에 참여할 수 있어요.</div>
   </div>
 
   <div class="card">
     <h2>📋 참가자 예측<span class="sub" id="count"></span></h2>
     <div id="list"><div class="empty">아직 등록된 예측이 없어요. 첫 번째로 걸어보세요!</div></div>
-    <button class="cta share" onclick="shareLink()">🔗 공유 링크 복사 — 카톡에 붙여넣기</button>
-    <div class="hint">예측 입력 후 이 버튼으로 링크를 복사해서 단톡방에 공유하세요.<br>친구가 링크를 열면 지금까지의 예측이 모두 보이고, 본인 예측을 추가해 다시 공유하면 됩니다.</div>
   </div>
 
   <div class="card">
     <h2>🏁 정산<span class="sub">경기 끝나고 실제 스코어 입력</span></h2>
     <div class="score-input" style="max-width:300px; margin:0 auto;">
-      <div style="flex:1"><label style="text-align:center">🇰🇷 한국</label><input id="r-kr" type="number" min="0" max="15" placeholder="-"></div>
+      <div style="flex:1"><label style="text-align:center"><svg class="flag-mini"><use href="#flag-kr"/></svg> 한국</label><input id="r-kr" type="number" min="0" max="15" placeholder="-"></div>
       <div class="colon">:</div>
-      <div style="flex:1"><label style="text-align:center">🇨🇿 체코</label><input id="r-cz" type="number" min="0" max="15" placeholder="-"></div>
+      <div style="flex:1"><label style="text-align:center"><svg class="flag-mini"><use href="#flag-cz"/></svg> 체코</label><input id="r-cz" type="number" min="0" max="15" placeholder="-"></div>
     </div>
     <button class="cta settle" onclick="settle()">정산하기</button>
     <div id="verdict"></div>
@@ -198,45 +260,127 @@
 <div class="toast" id="toast">링크가 복사됐어요! 카톡에 붙여넣으세요 📋</div>
 
 <script>
-  const LS_KEY = 'toto-kr-cz-v2';
-  let bets = {};      // { id: {name, stake, kr, cz, scorer, ts} }
-  let actual = null;
+  // ── 공유 저장소: jsonblob.com (무료, 가입 불필요) ──
+  // 첫 방문자가 자동으로 공유방(blob)을 만들고, 방 ID가 URL(#room=...)에 붙습니다.
+  // 그 링크로 들어온 사람은 모두 같은 데이터를 보고, 5초마다 자동 동기화됩니다.
+  const API = 'https://jsonblob.com/api/jsonBlob';
+  const LS_KEY = 'toto-kr-cz-v3';
+  const LS_ROOM = 'toto-kr-cz-v3-room';
+
+  let roomId = null;
+  let bets = {};       // { id: {name, kr, cz, scorer, ts} }
+  let actual = null;   // { kr, cz, ts }
+  let deleted = [];    // 삭제된 예측 id (기기 간 삭제 동기화용)
+  let pushing = false;
 
   const $ = id => document.getElementById(id);
   const esc = s => { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; };
   const outcome = (a, b) => a > b ? 'W' : a < b ? 'L' : 'D';
 
-  // ── 직렬화: 상태 ↔ URL 해시 (한글 안전 base64) ──
-  const encode = obj => btoa(String.fromCharCode(...new TextEncoder().encode(JSON.stringify(obj))));
-  const decode = str => JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(str), c => c.charCodeAt(0))));
-
-  function loadState() {
-    // 1) 내 기기에 저장된 것 불러오기
-    try {
-      const saved = JSON.parse(localStorage.getItem(LS_KEY) || '{}');
-      bets = saved.bets || {};
-      actual = saved.actual || null;
-    } catch (e) { bets = {}; }
-
-    // 2) 공유 링크로 들어왔다면, 링크 속 데이터를 합치기 (같은 id는 중복 안 됨)
-    const hash = location.hash.slice(1);
-    if (hash) {
-      try {
-        const shared = decode(hash);
-        Object.assign(bets, shared.bets || {});
-        if (shared.actual) actual = shared.actual;
-        saveState();
-      } catch (e) { /* 잘못된 링크는 무시 */ }
-    }
-
-    if (actual) { $('r-kr').value = actual.kr; $('r-cz').value = actual.cz; showVerdict(); }
-    render();
+  function setSync(state, text) {
+    const el = $('sync');
+    el.classList.remove('on', 'off');
+    if (state === true) { el.classList.add('on'); $('sync-text').textContent = text || '실시간 공유 중 · 모두 같은 데이터를 봐요'; }
+    else if (state === false) { el.classList.add('off'); $('sync-text').textContent = text || '오프라인 · 이 기기에만 저장돼요'; }
+    else { $('sync-text').textContent = text || '연결 확인 중...'; }
   }
 
-  function saveState() {
-    try { localStorage.setItem(LS_KEY, JSON.stringify({ bets, actual })); } catch (e) {}
-    // 주소창의 링크도 항상 최신 상태로 유지 → 주소만 복사해도 공유 가능
-    try { history.replaceState(null, '', '#' + encode({ bets, actual })); } catch (e) {}
+  // ── 로컬 캐시 ──
+  function loadLocal() {
+    try {
+      const s = JSON.parse(localStorage.getItem(LS_KEY) || '{}');
+      bets = s.bets || {}; actual = s.actual || null; deleted = s.deleted || [];
+    } catch (e) { bets = {}; actual = null; deleted = []; }
+  }
+  function saveLocal() {
+    try { localStorage.setItem(LS_KEY, JSON.stringify({ bets, actual, deleted })); } catch (e) {}
+  }
+
+  // ── 원격 상태 병합 ──
+  function mergeRemote(remote) {
+    const before = JSON.stringify({ bets, actual, deleted });
+    deleted = [...new Set([...deleted, ...(remote.deleted || [])])];
+    bets = Object.assign({}, remote.bets || {}, bets);
+    deleted.forEach(id => delete bets[id]);
+    const ra = remote.actual;
+    if (ra && (!actual || (ra.ts || 0) > (actual.ts || 0))) actual = ra;
+    return before !== JSON.stringify({ bets, actual, deleted });
+  }
+
+  function getRoomFromHash() {
+    const m = location.hash.match(/room=([A-Za-z0-9]+)/);
+    return m ? m[1] : null;
+  }
+  function setHash() {
+    try { history.replaceState(null, '', '#room=' + roomId); } catch (e) {}
+  }
+
+  // ── 원격 통신 ──
+  async function createRoom() {
+    try {
+      const res = await fetch(API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bets, actual, deleted })
+      });
+      if (!res.ok) throw new Error(res.status);
+      const loc = res.headers.get('Location') || res.headers.get('X-jsonblob') || '';
+      const id = loc.split('/').pop();
+      if (!id) throw new Error('no id');
+      roomId = id;
+      localStorage.setItem(LS_ROOM, roomId);
+      setHash();
+      setSync(true);
+      return true;
+    } catch (e) {
+      setSync(false);
+      return false;
+    }
+  }
+
+  async function pull() {
+    if (!roomId) return false;
+    try {
+      const res = await fetch(API + '/' + roomId, { cache: 'no-store' });
+      if (res.status === 404) return null; // 방이 만료됨
+      if (!res.ok) throw new Error(res.status);
+      const remote = await res.json();
+      const changed = mergeRemote(remote || {});
+      if (changed) { saveLocal(); render(); syncActualInputs(); if (actual) showVerdict(); }
+      setSync(true);
+      return true;
+    } catch (e) {
+      setSync(false);
+      return false;
+    }
+  }
+
+  async function push() {
+    if (!roomId || pushing) return;
+    pushing = true;
+    try {
+      // 최신 원격 상태를 먼저 합친 뒤 저장 → 다른 사람 데이터가 지워지지 않음
+      try {
+        const res = await fetch(API + '/' + roomId, { cache: 'no-store' });
+        if (res.ok) mergeRemote(await res.json() || {});
+      } catch (e) {}
+      const put = await fetch(API + '/' + roomId, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bets, actual, deleted })
+      });
+      if (!put.ok) throw new Error(put.status);
+      saveLocal();
+      setSync(true);
+    } catch (e) {
+      setSync(false);
+    } finally {
+      pushing = false;
+    }
+  }
+
+  function syncActualInputs() {
+    if (actual) { $('r-kr').value = actual.kr; $('r-cz').value = actual.cz; }
   }
 
   // ── 등록 / 삭제 ──
@@ -247,28 +391,29 @@
     const id = 'b' + Date.now() + Math.random().toString(36).slice(2, 6);
     bets[id] = {
       name,
-      stake: $('f-stake').value.trim(),
       kr: Math.max(0, parseInt($('f-kr').value) || 0),
       cz: Math.max(0, parseInt($('f-cz').value) || 0),
       scorer: $('f-scorer').value,
       ts: Date.now()
     };
-    $('f-name').value = ''; $('f-stake').value = '';
-    saveState();
+    $('f-name').value = '';
+    saveLocal();
     render();
+    push();
   }
 
   function removeBet(id) {
     if (!confirm('이 예측을 삭제할까요?')) return;
     delete bets[id];
-    saveState();
+    deleted.push(id);
+    saveLocal();
     if (actual) showVerdict();
     render();
+    push();
   }
 
   // ── 공유 ──
   function shareLink() {
-    saveState();
     const url = location.href;
     const done = () => {
       const t = $('toast');
@@ -304,14 +449,14 @@
         else if (outcome(b.kr, b.cz) === outcome(actual.kr, actual.cz)) { cls = 'hit-result'; pill = '<span class="pill green">승무패 적중</span>'; }
         else cls = 'miss';
       }
-      const extra = [b.scorer && '첫 골: ' + esc(b.scorer), b.stake && '🎁 ' + esc(b.stake)].filter(Boolean).join(' · ');
+      const extra = b.scorer ? '첫 골: ' + esc(b.scorer) : '';
       return `<div class="bet ${cls}">
         <div>
           <div class="nm">${esc(b.name)} ${pill}</div>
           ${extra ? `<div class="ex">${extra}</div>` : ''}
         </div>
         <div style="display:flex;align-items:center;">
-          <span class="sc"><span class="k">${b.kr}</span> : <span class="c">${b.cz}</span></span>
+          <span class="sc"><svg class="flag-mini"><use href="#flag-kr"/></svg> <span class="k">${b.kr}</span> : <span class="c">${b.cz}</span> <svg class="flag-mini"><use href="#flag-cz"/></svg></span>
           <button class="x" onclick="removeBet('${id}')" title="삭제">✕</button>
         </div>
       </div>`;
@@ -324,10 +469,11 @@
       $('verdict').innerHTML = '<div class="verdict">실제 스코어를 먼저 입력해주세요!</div>';
       return;
     }
-    actual = { kr: parseInt($('r-kr').value), cz: parseInt($('r-cz').value) };
-    saveState();
+    actual = { kr: parseInt($('r-kr').value), cz: parseInt($('r-cz').value), ts: Date.now() };
+    saveLocal();
     render();
     showVerdict();
+    push();
   }
 
   function showVerdict() {
@@ -342,13 +488,37 @@
     else msg = '등록된 예측이 없어요.';
     $('verdict').innerHTML = `<div class="verdict">
       <div style="font-size:12px;color:var(--muted);letter-spacing:.1em;">FINAL SCORE</div>
-      <div class="final">🇰🇷 ${actual.kr} : ${actual.cz} 🇨🇿</div>
+      <div class="final"><svg class="flag-mini" style="width:36px;height:24px;vertical-align:-2px"><use href="#flag-kr"/></svg> ${actual.kr} : ${actual.cz} <svg class="flag-mini" style="width:36px;height:24px;vertical-align:-2px"><use href="#flag-cz"/></svg></div>
       ${msg}
     </div>`;
   }
 
-  ['f-name', 'f-stake'].forEach(id => $(id).addEventListener('keydown', e => { if (e.key === 'Enter') addBet(); }));
-  loadState();
+  // ── 시작 ──
+  async function init() {
+    loadLocal();
+    render();
+    syncActualInputs();
+    if (actual) showVerdict();
+
+    roomId = getRoomFromHash() || localStorage.getItem(LS_ROOM);
+    if (roomId) {
+      localStorage.setItem(LS_ROOM, roomId);
+      setHash();
+      const ok = await pull();
+      if (ok === null) { roomId = null; await createRoom(); } // 방 만료 → 새로 생성
+      else if (ok) await push(); // 내 로컬 데이터도 방에 합치기
+    } else {
+      await createRoom();
+    }
+
+    if (roomId) {
+      setInterval(pull, 5000);
+      document.addEventListener('visibilitychange', () => { if (!document.hidden) pull(); });
+    }
+  }
+
+  $('f-name').addEventListener('keydown', e => { if (e.key === 'Enter') addBet(); });
+  init();
 </script>
 </body>
 </html>
