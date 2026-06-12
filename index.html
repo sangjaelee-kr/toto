@@ -236,7 +236,7 @@
     </div>
     <button class="cta" onclick="addBet()">예측 등록하기</button>
     <button class="cta share" onclick="shareLink()">📋 공유 링크 복사</button>
-    <div class="hint">친구들에게 <b>공유 링크</b>를 보내야 같은 내기판에 참여할 수 있어요.</div>
+    <div class="hint">이 <b>주소만 공유하면</b> 모두 같은 내기판에 참여할 수 있어요.</div>
   </div>
 
   <div class="card">
@@ -249,12 +249,13 @@
 <div class="toast" id="toast">링크가 복사됐어요! 카톡에 붙여넣으세요 📋</div>
 
 <script>
-  // ── 공유 저장소: jsonblob.com (무료, 가입 불필요) ──
-  // 첫 방문자가 자동으로 공유방(blob)을 만들고, 방 ID가 URL(#room=...)에 붙습니다.
-  // 그 링크로 들어온 사람은 모두 같은 데이터를 보고, 5초마다 자동 동기화됩니다.
-  const API = 'https://jsonblob.com/api/jsonBlob';
-  const LS_KEY = 'toto-kr-cz-v3';
-  const LS_ROOM = 'toto-kr-cz-v3-room';
+  // ── 공유 저장소: api.restful-api.dev (무료, 가입 불필요, CORS 허용) ──
+  // 기본 공유방 ID가 코드에 고정돼 있어서, 같은 주소로 접속하면 모두 같은 데이터를 봅니다.
+  // 5초마다 자동 동기화됩니다.
+  const API = 'https://api.restful-api.dev/objects';
+  const DEFAULT_ROOM = 'ff8081819d82fab6019eb97e1c167694';
+  const LS_KEY = 'toto-kr-cz-v4';
+  const LS_ROOM = 'toto-kr-cz-v4-room';
 
   let roomId = null;
   let bets = {};       // { id: {name, kr, cz, scorer, ts} }
@@ -310,13 +311,12 @@
       const res = await fetch(API, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ bets, actual, deleted })
+        body: JSON.stringify({ name: 'toto-kr-cz', data: { bets, actual, deleted } })
       });
       if (!res.ok) throw new Error(res.status);
-      const loc = res.headers.get('Location') || res.headers.get('X-jsonblob') || '';
-      const id = loc.split('/').pop();
-      if (!id) throw new Error('no id');
-      roomId = id;
+      const obj = await res.json();
+      if (!obj.id) throw new Error('no id');
+      roomId = obj.id;
       localStorage.setItem(LS_ROOM, roomId);
       setHash();
       setSync(true);
@@ -333,8 +333,8 @@
       const res = await fetch(API + '/' + roomId, { cache: 'no-store' });
       if (res.status === 404) return null; // 방이 만료됨
       if (!res.ok) throw new Error(res.status);
-      const remote = await res.json();
-      const changed = mergeRemote(remote || {});
+      const obj = await res.json();
+      const changed = mergeRemote((obj && obj.data) || {});
       if (changed) { saveLocal(); render(); }
       setSync(true);
       return true;
@@ -351,12 +351,12 @@
       // 최신 원격 상태를 먼저 합친 뒤 저장 → 다른 사람 데이터가 지워지지 않음
       try {
         const res = await fetch(API + '/' + roomId, { cache: 'no-store' });
-        if (res.ok) mergeRemote(await res.json() || {});
+        if (res.ok) { const obj = await res.json(); mergeRemote((obj && obj.data) || {}); }
       } catch (e) {}
       const put = await fetch(API + '/' + roomId, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ bets, actual, deleted })
+        body: JSON.stringify({ name: 'toto-kr-cz', data: { bets, actual, deleted } })
       });
       if (!put.ok) throw new Error(put.status);
       saveLocal();
@@ -452,16 +452,10 @@
     loadLocal();
     render();
 
-    roomId = getRoomFromHash() || localStorage.getItem(LS_ROOM);
-    if (roomId) {
-      localStorage.setItem(LS_ROOM, roomId);
-      setHash();
-      const ok = await pull();
-      if (ok === null) { roomId = null; await createRoom(); } // 방 만료 → 새로 생성
-      else if (ok) await push(); // 내 로컬 데이터도 방에 합치기
-    } else {
-      await createRoom();
-    }
+    roomId = getRoomFromHash() || DEFAULT_ROOM;
+    const ok = await pull();
+    if (ok === null) { roomId = null; await createRoom(); } // 방이 사라짐 → 새로 생성
+    else if (ok) await push(); // 내 로컬 데이터도 방에 합치기
 
     if (roomId) {
       setInterval(pull, 5000);
