@@ -7,7 +7,6 @@
 <style>
   :root {
     --navy: #0B1530;
-    --navy-2: #12204A;
     --red: #CD2E3A;
     --blue: #0047A0;
     --gold: #F2B705;
@@ -26,19 +25,14 @@
   }
   .wrap { max-width: 680px; margin: 0 auto; }
 
-  /* ── 경기 헤더 ── */
   .match {
-    text-align: center;
-    border: 1px solid var(--line);
-    border-radius: 20px;
+    text-align: center; border: 1px solid var(--line); border-radius: 20px;
     padding: 26px 18px 22px;
     background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01));
-    position: relative;
-    overflow: hidden;
+    position: relative; overflow: hidden;
   }
   .match::before {
-    content: "";
-    position: absolute; inset: 0;
+    content: ""; position: absolute; inset: 0;
     background:
       linear-gradient(115deg, rgba(205,46,58,0.18) 0%, transparent 38%),
       linear-gradient(-115deg, rgba(0,71,160,0.22) 0%, transparent 38%);
@@ -48,36 +42,29 @@
   .teams { display: flex; align-items: center; justify-content: center; gap: 22px; margin: 14px 0 10px; }
   .team { width: 130px; }
   .team .flag { font-size: 46px; line-height: 1; display: block; }
-  .team .name { font-size: 18px; font-weight: 900; margin-top: 8px; letter-spacing: 0.02em; }
+  .team .name { font-size: 18px; font-weight: 900; margin-top: 8px; }
   .vs { font-size: 14px; font-weight: 800; color: var(--gold); letter-spacing: 0.2em; }
   .kickoff { font-size: 13px; color: var(--muted); line-height: 1.6; }
   .kickoff b { color: var(--ink); }
 
-  /* ── 카드 공통 ── */
   .card {
-    border: 1px solid var(--line);
-    border-radius: 18px;
-    background: rgba(255,255,255,0.035);
-    padding: 20px 18px;
-    margin-top: 16px;
+    border: 1px solid var(--line); border-radius: 18px;
+    background: rgba(255,255,255,0.035); padding: 20px 18px; margin-top: 16px;
   }
-  .card h2 { font-size: 15px; font-weight: 900; letter-spacing: 0.02em; margin-bottom: 14px; }
+  .card h2 { font-size: 15px; font-weight: 900; margin-bottom: 14px; }
   .card h2 .sub { font-size: 12px; font-weight: 600; color: var(--muted); margin-left: 6px; }
 
-  label { display: block; font-size: 11.5px; font-weight: 700; color: var(--muted); margin-bottom: 5px; letter-spacing: 0.04em; }
+  label { display: block; font-size: 11.5px; font-weight: 700; color: var(--muted); margin-bottom: 5px; }
   input, select {
-    width: 100%; padding: 11px 12px;
-    border-radius: 12px; border: 1px solid var(--line);
-    background: rgba(11,21,48,0.6); color: var(--ink);
-    font-size: 15px; font-family: inherit;
-    outline: none;
+    width: 100%; padding: 11px 12px; border-radius: 12px;
+    border: 1px solid var(--line); background: rgba(11,21,48,0.6);
+    color: var(--ink); font-size: 15px; font-family: inherit; outline: none;
   }
   input:focus, select:focus { border-color: var(--gold); }
   input[type=number] { text-align: center; font-size: 24px; font-weight: 900; padding: 8px; font-variant-numeric: tabular-nums; }
   .grid { display: flex; gap: 10px; }
   .grid > div { flex: 1; min-width: 0; }
   .mt { margin-top: 12px; }
-
   .score-input { display: flex; align-items: flex-end; gap: 10px; }
   .score-input .colon { font-size: 26px; font-weight: 900; padding-bottom: 8px; color: var(--muted); }
 
@@ -87,29 +74,22 @@
     font-size: 15px; font-weight: 900; font-family: inherit;
     cursor: pointer; color: #fff;
     background: linear-gradient(135deg, var(--red), #A31E29);
-    letter-spacing: 0.04em;
     transition: transform .08s ease, filter .15s ease;
   }
   button.cta:hover { filter: brightness(1.1); }
   button.cta:active { transform: scale(0.98); }
   button.cta.settle { background: linear-gradient(135deg, var(--green), #1F7A43); }
+  button.cta.share { background: linear-gradient(135deg, #2D6FD1, var(--blue)); margin-top: 10px; }
 
-  /* ── 예측 목록 ── */
   .bet {
     display: flex; align-items: center; justify-content: space-between;
     padding: 12px 14px; border-radius: 14px;
-    border: 1px solid var(--line);
-    background: rgba(11,21,48,0.45);
-    margin-bottom: 9px;
-    transition: border-color .2s, background .2s;
+    border: 1px solid var(--line); background: rgba(11,21,48,0.45);
+    margin-bottom: 9px; transition: border-color .2s, background .2s;
   }
-  .bet .who { min-width: 0; }
   .bet .nm { font-weight: 800; font-size: 15px; display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
   .bet .ex { font-size: 11.5px; color: var(--muted); margin-top: 3px; }
-  .bet .sc {
-    font-size: 24px; font-weight: 900; letter-spacing: 1px;
-    font-variant-numeric: tabular-nums; white-space: nowrap;
-  }
+  .bet .sc { font-size: 24px; font-weight: 900; letter-spacing: 1px; font-variant-numeric: tabular-nums; white-space: nowrap; }
   .bet .sc .k { color: #FF8E97; } .bet .sc .c { color: #8FB6FF; }
   .bet.hit-exact { border-color: var(--gold); background: rgba(242,183,5,0.10); box-shadow: 0 0 18px rgba(242,183,5,0.18); }
   .bet.hit-result { border-color: var(--green); background: rgba(46,158,91,0.10); }
@@ -121,7 +101,6 @@
   .x:hover { color: var(--red); }
   .empty { text-align: center; color: var(--muted); font-size: 13px; padding: 18px 0; }
 
-  /* ── 정산 결과 ── */
   .verdict {
     margin-top: 14px; padding: 16px; border-radius: 14px;
     text-align: center; font-size: 14px; line-height: 1.7;
@@ -129,6 +108,17 @@
   }
   .verdict .final { font-size: 30px; font-weight: 900; letter-spacing: 2px; margin: 4px 0 8px; font-variant-numeric: tabular-nums; }
   .verdict b { color: var(--gold); }
+
+  .hint { font-size: 11.5px; color: var(--muted); text-align: center; margin-top: 10px; line-height: 1.6; }
+
+  .toast {
+    position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%) translateY(80px);
+    background: var(--green); color: #fff; font-size: 13.5px; font-weight: 800;
+    padding: 12px 22px; border-radius: 999px; opacity: 0;
+    transition: transform .25s ease, opacity .25s ease;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4); z-index: 99;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
   @media (max-width: 480px) {
     .team { width: 100px; }
@@ -174,6 +164,7 @@
           <option>황희찬</option>
           <option>오현규</option>
           <option>이재성</option>
+          <option>김민재</option>
           <option>기타 한국 선수</option>
           <option>시크 (체코)</option>
           <option>기타 체코 선수</option>
@@ -187,6 +178,8 @@
   <div class="card">
     <h2>📋 참가자 예측<span class="sub" id="count"></span></h2>
     <div id="list"><div class="empty">아직 등록된 예측이 없어요. 첫 번째로 걸어보세요!</div></div>
+    <button class="cta share" onclick="shareLink()">🔗 공유 링크 복사 — 카톡에 붙여넣기</button>
+    <div class="hint">예측 입력 후 이 버튼으로 링크를 복사해서 단톡방에 공유하세요.<br>친구가 링크를 열면 지금까지의 예측이 모두 보이고, 본인 예측을 추가해 다시 공유하면 됩니다.</div>
   </div>
 
   <div class="card">
@@ -202,38 +195,109 @@
 
 </div>
 
+<div class="toast" id="toast">링크가 복사됐어요! 카톡에 붙여넣으세요 📋</div>
+
 <script>
-  let bets = [];
+  const LS_KEY = 'toto-kr-cz-v2';
+  let bets = {};      // { id: {name, stake, kr, cz, scorer, ts} }
   let actual = null;
 
   const $ = id => document.getElementById(id);
   const esc = s => { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; };
   const outcome = (a, b) => a > b ? 'W' : a < b ? 'L' : 'D';
 
+  // ── 직렬화: 상태 ↔ URL 해시 (한글 안전 base64) ──
+  const encode = obj => btoa(String.fromCharCode(...new TextEncoder().encode(JSON.stringify(obj))));
+  const decode = str => JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(str), c => c.charCodeAt(0))));
+
+  function loadState() {
+    // 1) 내 기기에 저장된 것 불러오기
+    try {
+      const saved = JSON.parse(localStorage.getItem(LS_KEY) || '{}');
+      bets = saved.bets || {};
+      actual = saved.actual || null;
+    } catch (e) { bets = {}; }
+
+    // 2) 공유 링크로 들어왔다면, 링크 속 데이터를 합치기 (같은 id는 중복 안 됨)
+    const hash = location.hash.slice(1);
+    if (hash) {
+      try {
+        const shared = decode(hash);
+        Object.assign(bets, shared.bets || {});
+        if (shared.actual) actual = shared.actual;
+        saveState();
+      } catch (e) { /* 잘못된 링크는 무시 */ }
+    }
+
+    if (actual) { $('r-kr').value = actual.kr; $('r-cz').value = actual.cz; showVerdict(); }
+    render();
+  }
+
+  function saveState() {
+    try { localStorage.setItem(LS_KEY, JSON.stringify({ bets, actual })); } catch (e) {}
+    // 주소창의 링크도 항상 최신 상태로 유지 → 주소만 복사해도 공유 가능
+    try { history.replaceState(null, '', '#' + encode({ bets, actual })); } catch (e) {}
+  }
+
+  // ── 등록 / 삭제 ──
   function addBet() {
     const name = $('f-name').value.trim();
     if (!name) { $('f-name').focus(); $('f-name').style.borderColor = '#CD2E3A'; return; }
     $('f-name').style.borderColor = '';
-    bets.push({
+    const id = 'b' + Date.now() + Math.random().toString(36).slice(2, 6);
+    bets[id] = {
       name,
       stake: $('f-stake').value.trim(),
       kr: Math.max(0, parseInt($('f-kr').value) || 0),
       cz: Math.max(0, parseInt($('f-cz').value) || 0),
-      scorer: $('f-scorer').value
-    });
+      scorer: $('f-scorer').value,
+      ts: Date.now()
+    };
     $('f-name').value = ''; $('f-stake').value = '';
+    saveState();
     render();
   }
 
-  function removeBet(i) { bets.splice(i, 1); if (actual) settleCore(); else render(); }
+  function removeBet(id) {
+    if (!confirm('이 예측을 삭제할까요?')) return;
+    delete bets[id];
+    saveState();
+    if (actual) showVerdict();
+    render();
+  }
 
+  // ── 공유 ──
+  function shareLink() {
+    saveState();
+    const url = location.href;
+    const done = () => {
+      const t = $('toast');
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2500);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(done).catch(() => fallbackCopy(url, done));
+    } else {
+      fallbackCopy(url, done);
+    }
+  }
+  function fallbackCopy(text, done) {
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); done(); } catch (e) { prompt('아래 링크를 복사하세요:', text); }
+    document.body.removeChild(ta);
+  }
+
+  // ── 렌더 ──
   function render() {
-    $('count').textContent = bets.length ? bets.length + '명 참가' : '';
-    if (!bets.length) {
+    const entries = Object.entries(bets).sort((a, b) => (a[1].ts || 0) - (b[1].ts || 0));
+    $('count').textContent = entries.length ? entries.length + '명 참가' : '';
+    if (!entries.length) {
       $('list').innerHTML = '<div class="empty">아직 등록된 예측이 없어요. 첫 번째로 걸어보세요!</div>';
       return;
     }
-    $('list').innerHTML = bets.map((b, i) => {
+    $('list').innerHTML = entries.map(([id, b]) => {
       let cls = '', pill = '';
       if (actual) {
         if (b.kr === actual.kr && b.cz === actual.cz) { cls = 'hit-exact'; pill = '<span class="pill gold">🎯 스코어 적중</span>'; }
@@ -242,35 +306,39 @@
       }
       const extra = [b.scorer && '첫 골: ' + esc(b.scorer), b.stake && '🎁 ' + esc(b.stake)].filter(Boolean).join(' · ');
       return `<div class="bet ${cls}">
-        <div class="who">
+        <div>
           <div class="nm">${esc(b.name)} ${pill}</div>
           ${extra ? `<div class="ex">${extra}</div>` : ''}
         </div>
         <div style="display:flex;align-items:center;">
           <span class="sc"><span class="k">${b.kr}</span> : <span class="c">${b.cz}</span></span>
-          <button class="x" onclick="removeBet(${i})" title="삭제">✕</button>
+          <button class="x" onclick="removeBet('${id}')" title="삭제">✕</button>
         </div>
       </div>`;
     }).join('');
   }
 
+  // ── 정산 ──
   function settle() {
     if ($('r-kr').value === '' || $('r-cz').value === '') {
       $('verdict').innerHTML = '<div class="verdict">실제 스코어를 먼저 입력해주세요!</div>';
       return;
     }
     actual = { kr: parseInt($('r-kr').value), cz: parseInt($('r-cz').value) };
-    settleCore();
+    saveState();
+    render();
+    showVerdict();
   }
 
-  function settleCore() {
-    render();
-    const exact = bets.filter(b => b.kr === actual.kr && b.cz === actual.cz);
-    const partial = bets.filter(b => !(b.kr === actual.kr && b.cz === actual.cz) && outcome(b.kr, b.cz) === outcome(actual.kr, actual.cz));
+  function showVerdict() {
+    if (!actual) return;
+    const all = Object.values(bets);
+    const exact = all.filter(b => b.kr === actual.kr && b.cz === actual.cz);
+    const partial = all.filter(b => !(b.kr === actual.kr && b.cz === actual.cz) && outcome(b.kr, b.cz) === outcome(actual.kr, actual.cz));
     let msg;
     if (exact.length) msg = '🏆 스코어 완벽 적중 — <b>' + exact.map(b => esc(b.name)).join(', ') + '</b><br>오늘의 승자입니다!';
     else if (partial.length) msg = '정확한 스코어는 없었지만 승무패 적중 — <b>' + partial.map(b => esc(b.name)).join(', ') + '</b>';
-    else if (bets.length) msg = '😅 아무도 못 맞췄어요. 무효 처리 아니면 전원 N빵으로!';
+    else if (all.length) msg = '😅 아무도 못 맞췄어요. 무효 처리 아니면 전원 N빵으로!';
     else msg = '등록된 예측이 없어요.';
     $('verdict').innerHTML = `<div class="verdict">
       <div style="font-size:12px;color:var(--muted);letter-spacing:.1em;">FINAL SCORE</div>
@@ -279,7 +347,8 @@
     </div>`;
   }
 
-  ['f-name','f-stake'].forEach(id => $(id).addEventListener('keydown', e => { if (e.key === 'Enter') addBet(); }));
+  ['f-name', 'f-stake'].forEach(id => $(id).addEventListener('keydown', e => { if (e.key === 'Enter') addBet(); }));
+  loadState();
 </script>
 </body>
 </html>
