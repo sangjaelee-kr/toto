@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🇰🇷 한국 vs 체코 🇨🇿 내기판</title>
+<style>
+  :root {
+    --navy: #0B1530;
+    --navy-2: #12204A;
+    --red: #CD2E3A;
+    --blue: #0047A0;
+    --gold: #F2B705;
+    --green: #2E9E5B;
+    --ink: #F4F6FB;
+    --muted: rgba(244,246,251,0.55);
+    --line: rgba(244,246,251,0.14);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+    background: radial-gradient(1200px 600px at 50% -10%, #1B3B7A 0%, var(--navy) 55%) fixed;
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 24px 16px 60px;
+  }
+  .wrap { max-width: 680px; margin: 0 auto; }
+
+  /* ── 경기 헤더 ── */
+  .match {
+    text-align: center;
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 26px 18px 22px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01));
+    position: relative;
+    overflow: hidden;
+  }
+  .match::before {
+    content: "";
+    position: absolute; inset: 0;
+    background:
+      linear-gradient(115deg, rgba(205,46,58,0.18) 0%, transparent 38%),
+      linear-gradient(-115deg, rgba(0,71,160,0.22) 0%, transparent 38%);
+    pointer-events: none;
+  }
+  .eyebrow { font-size: 12px; letter-spacing: 0.18em; color: var(--muted); font-weight: 700; }
+  .teams { display: flex; align-items: center; justify-content: center; gap: 22px; margin: 14px 0 10px; }
+  .team { width: 130px; }
+  .team .flag { font-size: 46px; line-height: 1; display: block; }
+  .team .name { font-size: 18px; font-weight: 900; margin-top: 8px; letter-spacing: 0.02em; }
+  .vs { font-size: 14px; font-weight: 800; color: var(--gold); letter-spacing: 0.2em; }
+  .kickoff { font-size: 13px; color: var(--muted); line-height: 1.6; }
+  .kickoff b { color: var(--ink); }
+
+  /* ── 카드 공통 ── */
+  .card {
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    background: rgba(255,255,255,0.035);
+    padding: 20px 18px;
+    margin-top: 16px;
+  }
+  .card h2 { font-size: 15px; font-weight: 900; letter-spacing: 0.02em; margin-bottom: 14px; }
+  .card h2 .sub { font-size: 12px; font-weight: 600; color: var(--muted); margin-left: 6px; }
+
+  label { display: block; font-size: 11.5px; font-weight: 700; color: var(--muted); margin-bottom: 5px; letter-spacing: 0.04em; }
+  input, select {
+    width: 100%; padding: 11px 12px;
+    border-radius: 12px; border: 1px solid var(--line);
+    background: rgba(11,21,48,0.6); color: var(--ink);
+    font-size: 15px; font-family: inherit;
+    outline: none;
+  }
+  input:focus, select:focus { border-color: var(--gold); }
+  input[type=number] { text-align: center; font-size: 24px; font-weight: 900; padding: 8px; font-variant-numeric: tabular-nums; }
+  .grid { display: flex; gap: 10px; }
+  .grid > div { flex: 1; min-width: 0; }
+  .mt { margin-top: 12px; }
+
+  .score-input { display: flex; align-items: flex-end; gap: 10px; }
+  .score-input .colon { font-size: 26px; font-weight: 900; padding-bottom: 8px; color: var(--muted); }
+
+  button.cta {
+    width: 100%; margin-top: 16px; padding: 13px;
+    border: none; border-radius: 12px;
+    font-size: 15px; font-weight: 900; font-family: inherit;
+    cursor: pointer; color: #fff;
+    background: linear-gradient(135deg, var(--red), #A31E29);
+    letter-spacing: 0.04em;
+    transition: transform .08s ease, filter .15s ease;
+  }
+  button.cta:hover { filter: brightness(1.1); }
+  button.cta:active { transform: scale(0.98); }
+  button.cta.settle { background: linear-gradient(135deg, var(--green), #1F7A43); }
+
+  /* ── 예측 목록 ── */
+  .bet {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 14px; border-radius: 14px;
+    border: 1px solid var(--line);
+    background: rgba(11,21,48,0.45);
+    margin-bottom: 9px;
+    transition: border-color .2s, background .2s;
+  }
+  .bet .who { min-width: 0; }
+  .bet .nm { font-weight: 800; font-size: 15px; display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+  .bet .ex { font-size: 11.5px; color: var(--muted); margin-top: 3px; }
+  .bet .sc {
+    font-size: 24px; font-weight: 900; letter-spacing: 1px;
+    font-variant-numeric: tabular-nums; white-space: nowrap;
+  }
+  .bet .sc .k { color: #FF8E97; } .bet .sc .c { color: #8FB6FF; }
+  .bet.hit-exact { border-color: var(--gold); background: rgba(242,183,5,0.10); box-shadow: 0 0 18px rgba(242,183,5,0.18); }
+  .bet.hit-result { border-color: var(--green); background: rgba(46,158,91,0.10); }
+  .bet.miss { opacity: 0.45; }
+  .pill { font-size: 10.5px; font-weight: 800; padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
+  .pill.gold { background: var(--gold); color: #2b2100; }
+  .pill.green { background: var(--green); color: #fff; }
+  .x { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 15px; margin-left: 10px; padding: 4px; }
+  .x:hover { color: var(--red); }
+  .empty { text-align: center; color: var(--muted); font-size: 13px; padding: 18px 0; }
+
+  /* ── 정산 결과 ── */
+  .verdict {
+    margin-top: 14px; padding: 16px; border-radius: 14px;
+    text-align: center; font-size: 14px; line-height: 1.7;
+    border: 1px dashed var(--line); background: rgba(255,255,255,0.03);
+  }
+  .verdict .final { font-size: 30px; font-weight: 900; letter-spacing: 2px; margin: 4px 0 8px; font-variant-numeric: tabular-nums; }
+  .verdict b { color: var(--gold); }
+
+  @media (max-width: 480px) {
+    .team { width: 100px; }
+    .team .flag { font-size: 38px; }
+    .grid.form-top { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="match">
+    <div class="eyebrow">2026 FIFA 월드컵 · A조 조별리그 1차전</div>
+    <div class="teams">
+      <div class="team"><span class="flag">🇰🇷</span><div class="name">대한민국</div></div>
+      <div class="vs">VS</div>
+      <div class="team"><span class="flag">🇨🇿</span><div class="name">체코</div></div>
+    </div>
+    <div class="kickoff"><b>6월 12일 (금) 오전 11:00</b> 한국시각<br>멕시코 과달라하라 스타디움 · JTBC / KBS2 중계</div>
+  </div>
+
+  <div class="card">
+    <h2>⚽ 예측 등록</h2>
+    <div class="grid form-top">
+      <div><label>이름</label><input id="f-name" placeholder="예: 상재" maxlength="12"></div>
+      <div><label>건 것 (선택)</label><input id="f-stake" placeholder="예: 치킨, 커피, 점심" maxlength="20"></div>
+    </div>
+    <div class="grid mt">
+      <div>
+        <label>스코어 예측</label>
+        <div class="score-input">
+          <div style="flex:1"><input id="f-kr" type="number" min="0" max="15" value="1"></div>
+          <div class="colon">:</div>
+          <div style="flex:1"><input id="f-cz" type="number" min="0" max="15" value="0"></div>
+        </div>
+      </div>
+      <div>
+        <label>첫 골 주인공 (선택)</label>
+        <select id="f-scorer">
+          <option value="">선택 안 함</option>
+          <option>손흥민</option>
+          <option>이강인</option>
+          <option>황희찬</option>
+          <option>오현규</option>
+          <option>이재성</option>
+          <option>기타 한국 선수</option>
+          <option>시크 (체코)</option>
+          <option>기타 체코 선수</option>
+          <option>무득점 경기</option>
+        </select>
+      </div>
+    </div>
+    <button class="cta" onclick="addBet()">예측 등록하기</button>
+  </div>
+
+  <div class="card">
+    <h2>📋 참가자 예측<span class="sub" id="count"></span></h2>
+    <div id="list"><div class="empty">아직 등록된 예측이 없어요. 첫 번째로 걸어보세요!</div></div>
+  </div>
+
+  <div class="card">
+    <h2>🏁 정산<span class="sub">경기 끝나고 실제 스코어 입력</span></h2>
+    <div class="score-input" style="max-width:300px; margin:0 auto;">
+      <div style="flex:1"><label style="text-align:center">🇰🇷 한국</label><input id="r-kr" type="number" min="0" max="15" placeholder="-"></div>
+      <div class="colon">:</div>
+      <div style="flex:1"><label style="text-align:center">🇨🇿 체코</label><input id="r-cz" type="number" min="0" max="15" placeholder="-"></div>
+    </div>
+    <button class="cta settle" onclick="settle()">정산하기</button>
+    <div id="verdict"></div>
+  </div>
+
+</div>
+
+<script>
+  let bets = [];
+  let actual = null;
+
+  const $ = id => document.getElementById(id);
+  const esc = s => { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; };
+  const outcome = (a, b) => a > b ? 'W' : a < b ? 'L' : 'D';
+
+  function addBet() {
+    const name = $('f-name').value.trim();
+    if (!name) { $('f-name').focus(); $('f-name').style.borderColor = '#CD2E3A'; return; }
+    $('f-name').style.borderColor = '';
+    bets.push({
+      name,
+      stake: $('f-stake').value.trim(),
+      kr: Math.max(0, parseInt($('f-kr').value) || 0),
+      cz: Math.max(0, parseInt($('f-cz').value) || 0),
+      scorer: $('f-scorer').value
+    });
+    $('f-name').value = ''; $('f-stake').value = '';
+    render();
+  }
+
+  function removeBet(i) { bets.splice(i, 1); if (actual) settleCore(); else render(); }
+
+  function render() {
+    $('count').textContent = bets.length ? bets.length + '명 참가' : '';
+    if (!bets.length) {
+      $('list').innerHTML = '<div class="empty">아직 등록된 예측이 없어요. 첫 번째로 걸어보세요!</div>';
+      return;
+    }
+    $('list').innerHTML = bets.map((b, i) => {
+      let cls = '', pill = '';
+      if (actual) {
+        if (b.kr === actual.kr && b.cz === actual.cz) { cls = 'hit-exact'; pill = '<span class="pill gold">🎯 스코어 적중</span>'; }
+        else if (outcome(b.kr, b.cz) === outcome(actual.kr, actual.cz)) { cls = 'hit-result'; pill = '<span class="pill green">승무패 적중</span>'; }
+        else cls = 'miss';
+      }
+      const extra = [b.scorer && '첫 골: ' + esc(b.scorer), b.stake && '🎁 ' + esc(b.stake)].filter(Boolean).join(' · ');
+      return `<div class="bet ${cls}">
+        <div class="who">
+          <div class="nm">${esc(b.name)} ${pill}</div>
+          ${extra ? `<div class="ex">${extra}</div>` : ''}
+        </div>
+        <div style="display:flex;align-items:center;">
+          <span class="sc"><span class="k">${b.kr}</span> : <span class="c">${b.cz}</span></span>
+          <button class="x" onclick="removeBet(${i})" title="삭제">✕</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function settle() {
+    if ($('r-kr').value === '' || $('r-cz').value === '') {
+      $('verdict').innerHTML = '<div class="verdict">실제 스코어를 먼저 입력해주세요!</div>';
+      return;
+    }
+    actual = { kr: parseInt($('r-kr').value), cz: parseInt($('r-cz').value) };
+    settleCore();
+  }
+
+  function settleCore() {
+    render();
+    const exact = bets.filter(b => b.kr === actual.kr && b.cz === actual.cz);
+    const partial = bets.filter(b => !(b.kr === actual.kr && b.cz === actual.cz) && outcome(b.kr, b.cz) === outcome(actual.kr, actual.cz));
+    let msg;
+    if (exact.length) msg = '🏆 스코어 완벽 적중 — <b>' + exact.map(b => esc(b.name)).join(', ') + '</b><br>오늘의 승자입니다!';
+    else if (partial.length) msg = '정확한 스코어는 없었지만 승무패 적중 — <b>' + partial.map(b => esc(b.name)).join(', ') + '</b>';
+    else if (bets.length) msg = '😅 아무도 못 맞췄어요. 무효 처리 아니면 전원 N빵으로!';
+    else msg = '등록된 예측이 없어요.';
+    $('verdict').innerHTML = `<div class="verdict">
+      <div style="font-size:12px;color:var(--muted);letter-spacing:.1em;">FINAL SCORE</div>
+      <div class="final">🇰🇷 ${actual.kr} : ${actual.cz} 🇨🇿</div>
+      ${msg}
+    </div>`;
+  }
+
+  ['f-name','f-stake'].forEach(id => $(id).addEventListener('keydown', e => { if (e.key === 'Enter') addBet(); }));
+</script>
+</body>
+</html>
