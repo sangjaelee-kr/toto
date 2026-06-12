@@ -244,17 +244,6 @@
     <div id="list"><div class="empty">아직 등록된 예측이 없어요. 첫 번째로 걸어보세요!</div></div>
   </div>
 
-  <div class="card">
-    <h2>🏁 정산<span class="sub">경기 끝나고 실제 스코어 입력</span></h2>
-    <div class="score-input" style="max-width:300px; margin:0 auto;">
-      <div style="flex:1"><label style="text-align:center"><svg class="flag-mini"><use href="#flag-kr"/></svg> 한국</label><input id="r-kr" type="number" min="0" max="15" placeholder="-"></div>
-      <div class="colon">:</div>
-      <div style="flex:1"><label style="text-align:center"><svg class="flag-mini"><use href="#flag-cz"/></svg> 체코</label><input id="r-cz" type="number" min="0" max="15" placeholder="-"></div>
-    </div>
-    <button class="cta settle" onclick="settle()">정산하기</button>
-    <div id="verdict"></div>
-  </div>
-
 </div>
 
 <div class="toast" id="toast">링크가 복사됐어요! 카톡에 붙여넣으세요 📋</div>
@@ -346,7 +335,7 @@
       if (!res.ok) throw new Error(res.status);
       const remote = await res.json();
       const changed = mergeRemote(remote || {});
-      if (changed) { saveLocal(); render(); syncActualInputs(); if (actual) showVerdict(); }
+      if (changed) { saveLocal(); render(); }
       setSync(true);
       return true;
     } catch (e) {
@@ -379,10 +368,6 @@
     }
   }
 
-  function syncActualInputs() {
-    if (actual) { $('r-kr').value = actual.kr; $('r-cz').value = actual.cz; }
-  }
-
   // ── 등록 / 삭제 ──
   function addBet() {
     const name = $('f-name').value.trim();
@@ -407,7 +392,6 @@
     delete bets[id];
     deleted.push(id);
     saveLocal();
-    if (actual) showVerdict();
     render();
     push();
   }
@@ -463,42 +447,10 @@
     }).join('');
   }
 
-  // ── 정산 ──
-  function settle() {
-    if ($('r-kr').value === '' || $('r-cz').value === '') {
-      $('verdict').innerHTML = '<div class="verdict">실제 스코어를 먼저 입력해주세요!</div>';
-      return;
-    }
-    actual = { kr: parseInt($('r-kr').value), cz: parseInt($('r-cz').value), ts: Date.now() };
-    saveLocal();
-    render();
-    showVerdict();
-    push();
-  }
-
-  function showVerdict() {
-    if (!actual) return;
-    const all = Object.values(bets);
-    const exact = all.filter(b => b.kr === actual.kr && b.cz === actual.cz);
-    const partial = all.filter(b => !(b.kr === actual.kr && b.cz === actual.cz) && outcome(b.kr, b.cz) === outcome(actual.kr, actual.cz));
-    let msg;
-    if (exact.length) msg = '🏆 스코어 완벽 적중 — <b>' + exact.map(b => esc(b.name)).join(', ') + '</b><br>오늘의 승자입니다!';
-    else if (partial.length) msg = '정확한 스코어는 없었지만 승무패 적중 — <b>' + partial.map(b => esc(b.name)).join(', ') + '</b>';
-    else if (all.length) msg = '😅 아무도 못 맞췄어요. 무효 처리 아니면 전원 N빵으로!';
-    else msg = '등록된 예측이 없어요.';
-    $('verdict').innerHTML = `<div class="verdict">
-      <div style="font-size:12px;color:var(--muted);letter-spacing:.1em;">FINAL SCORE</div>
-      <div class="final"><svg class="flag-mini" style="width:36px;height:24px;vertical-align:-2px"><use href="#flag-kr"/></svg> ${actual.kr} : ${actual.cz} <svg class="flag-mini" style="width:36px;height:24px;vertical-align:-2px"><use href="#flag-cz"/></svg></div>
-      ${msg}
-    </div>`;
-  }
-
   // ── 시작 ──
   async function init() {
     loadLocal();
     render();
-    syncActualInputs();
-    if (actual) showVerdict();
 
     roomId = getRoomFromHash() || localStorage.getItem(LS_ROOM);
     if (roomId) {
